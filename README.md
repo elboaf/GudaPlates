@@ -1,3 +1,10 @@
+threat plates based on available twthreat tank mode data
+revamp of othertank setting:
+/gp tank     -- set yourself as tank
+/gp othertank add <name>  --adds offtanks to othertank list
+
+
+
 # GudaPlates
 
 A customizable nameplate addon for World of Warcraft 1.12.1 (Vanilla) and Turtle WoW.
