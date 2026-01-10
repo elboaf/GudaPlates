@@ -1385,7 +1385,7 @@ else
         -- Player has aggro (BAD for DPS) - RED
         if threatPct >= 100 then
             -- 100%+: Blue (lost aggro)
-            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
+            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.AGGRO))
         elseif threatPct > 70 then
             -- 70-100%: Red → Yellow gradient (about to lose aggro)
             local gradientPercent = (threatPct - 70) / 30
@@ -1393,7 +1393,7 @@ else
             nameplate.health:SetStatusBarColor(unpack(blendedColor))
         else
             -- 0-70%: Red (you have aggro - BAD)
-            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.AGGRO))
+            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
         end
     else
         -- Player doesn't have aggro
@@ -1423,9 +1423,9 @@ end
                 end
             else
                 if isAttackingPlayer then
-                    nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
-                                    else
                     nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.AGGRO))
+                                    else
+                    nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
                 end
             end
         else
