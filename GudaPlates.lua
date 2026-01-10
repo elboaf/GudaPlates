@@ -1574,7 +1574,8 @@ end
             end
         end
         -- Target always has highest z-index
-        nameplate:SetFrameStrata("TOOLTIP")
+        nameplate:SetFrameStrata("BACKGROUND")
+        nameplate:SetFrameLevel(30)
     else
         -- Hide all bracket parts
         nameplate.targetBracket.leftVert:Hide()
@@ -1592,11 +1593,37 @@ end
         end
         -- Non-target z-index based on attacking state (only in overlap mode)
         if nameplateOverlap then
-            if isAttackingPlayer then
-                nameplate:SetFrameStrata("HIGH")
+            if playerRole == "TANK" then
+                -- Tank mode: prioritize mobs attacking other tanks, then others, then mobs attacking you
+                if isTargetingTank then
+                    -- Mob is attacking another tank - high priority for tank to see
+                    nameplate:SetFrameStrata("BACKGROUND")
+                    nameplate:SetFrameLevel(10)
+                elseif isAttackingPlayer then
+                    -- Mob is attacking you - lower priority since you already know
+                    nameplate:SetFrameStrata("BACKGROUND")
+                    nameplate:SetFrameLevel(10)
+                else
+                    -- Mob not attacking anyone, or attacking someone else
+                    nameplate:SetFrameStrata("LOW")
+                    nameplate:SetFrameLevel(40)
+                end
             else
-                nameplate:SetFrameStrata("MEDIUM")
+                -- DPS mode: prioritize mobs attacking you, then others
+                if isAttackingPlayer then
+                    -- Mob attacking you - high priority for DPS
+                    nameplate:SetFrameStrata("BACKGROUND")
+                    nameplate:SetFrameLevel(15)
+                else
+                    -- Mob not attacking you
+                    nameplate:SetFrameStrata("BACKGROUND")
+                    nameplate:SetFrameLevel(15)
+                end
             end
+        else
+            -- In stacking mode, use default strata
+            nameplate:SetFrameStrata("BACKGROUND")
+            nameplate:SetFrameLevel(10)
         end
     end
 
