@@ -1393,7 +1393,7 @@ else
             nameplate.health:SetStatusBarColor(unpack(blendedColor))
         else
             -- 0-70%: Red (you have aggro - BAD)
-            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
+            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.AGGRO))
         end
     else
         -- Player doesn't have aggro
