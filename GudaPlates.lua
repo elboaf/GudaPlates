@@ -1306,6 +1306,7 @@ end
 
     -- Determine color based on role and threat
 -- Determine color based on role and threat
+-- Determine color based on role and threat
 if isFriendly then
     nameplate.health:SetStatusBarColor(0.27, 0.63, 0.27, 1)
 elseif isNeutral and not isAttackingPlayer then
@@ -1323,8 +1324,38 @@ elseif (isHostile or (isNeutral and isAttackingPlayer)) then
         end
     end
 
-    -- If we're using class color for enemy player, skip threat coloring
-    if useClassColor and classColor then
+    -- Check if unit is casting and should turn gray (Settings.mobCastingGray must be true)
+    local isCasting = false
+    if nameplate.castbar and nameplate.castbar:IsShown() then
+        isCasting = true
+    end
+
+    -- If casting AND mobCastingGray is enabled AND not an enemy player, use gray
+    if isCasting and playerRole == "TANK" and not isEnemyPlayer then
+        if isTargetingTank then
+        -- Mob is targeting another tank in our list - use OTHER_TANK color
+        nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.OTHER_TANK))
+        elseif threatPct > 70 then
+            -- 70-100%: Red → Yellow gradient (losing aggro)
+            local gradientPercent = (threatPct - 70) / 30
+            local blendedColor = BlendColors(THREAT_COLORS.TANK.AGGRO, THREAT_COLORS.TANK.LOSING_AGGRO, gradientPercent)
+            nameplate.health:SetStatusBarColor(unpack(blendedColor))
+        elseif isAttackingPlayer then
+            -- 0-70%: Red (i have aggro)
+            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.AGGRO))
+        elseif threatPct > 70 then
+            -- 70-100%: Red → Yellow gradient (losing aggro)
+            local gradientPercent = (threatPct - 70) / 30
+            local blendedColor = BlendColors(THREAT_COLORS.TANK.AGGRO, THREAT_COLORS.TANK.LOSING_AGGRO, gradientPercent)
+            nameplate.health:SetStatusBarColor(unpack(blendedColor))
+        else
+            -- 0-70%: Red (i have aggro)
+            nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.NO_AGGRO))
+        end
+    elseif isCasting and not isEnemyPlayer then
+        nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.LOSING_AGGRO)) -- yellow color
+    -- If we're using class color for enemy player, keep it
+    elseif useClassColor and classColor then
         nameplate.health:SetStatusBarColor(unpack(classColor))
     else
         -- Hostile OR neutral that is attacking player
@@ -1332,9 +1363,9 @@ elseif (isHostile or (isNeutral and isAttackingPlayer)) then
         if not mobInCombat then
             -- Not in combat - default hostile red
             if playerRole == "TANK" then
-             nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.AGGRO))  -- RED for tank (bad - you don't have aggro yet)
-             else
-             nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))      -- RED for DPS (bad - mob not in combat)
+                nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.TANK.AGGRO))
+            else
+                nameplate.health:SetStatusBarColor(unpack(THREAT_COLORS.DPS.NO_AGGRO))
             end
         elseif isTappedByOthers then
             -- TAPPED: Mob is tapped by others - no other colors applied
