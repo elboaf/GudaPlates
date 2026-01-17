@@ -7,17 +7,6 @@ local macroFrame = CreateFrame("Frame")
 if DEFAULT_CHAT_FRAME then
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ffff[GudaPlates]|r Loading SuperWoW-only version...")
 end
-if GudaPlates_Debuffs then
-    -- Replace local functions with module functions
-    local function UpdateDebuffsWrapper(nameplate, unitstr, plateName, isTarget, hasValidGUID)
-        return GudaPlates_Debuffs:UpdateDebuffs(nameplate, unitstr, plateName, isTarget, hasValidGUID, superwow_active)
-    end
-    
-    -- Use module's FormatTime
-    local function FormatTime(remaining)
-        return GudaPlates_Debuffs:FormatTime(remaining)
-    end
-end
 
 -- Disable pfUI nameplates module
 local function DisablePfUINameplates()
@@ -1952,12 +1941,40 @@ end
     end
 
     -- Centering logic
-local numDebuffs = 0
-if GudaPlates_Debuffs then
-    numDebuffs = GudaPlates_Debuffs:UpdateDebuffs(nameplate, unitstr, plateName, isTarget, unitstr ~= nil)
-    GudaPlates_Debuffs:UpdateDebuffPositions(nameplate, numDebuffs)
-else
+    local numDebuffs = debuffIndex - 1
+    if numDebuffs > 0 then
+        local totalWidth = (numDebuffs * DEBUFF_SIZE) + (numDebuffs - 1) * 1
+        local startOffset = -totalWidth / 2
 
+        for i = 1, numDebuffs do
+            local debuff = nameplate.debuffs[i]
+            debuff:ClearAllPoints()
+            local x = startOffset + (i - 1) * (DEBUFF_SIZE + 1) + (DEBUFF_SIZE / 2)
+            if Settings.swapNameDebuff then
+                -- Debuffs below mana bar (or healthbar if no mana)
+                if nameplate.mana and nameplate.mana:IsShown() then
+                    debuff:SetPoint("TOP", nameplate.mana, "BOTTOM", x, 0)
+                else
+                    debuff:SetPoint("TOP", nameplate.health, "BOTTOM", x, 0)
+                end
+
+                -- Adjust name (above castbar which is above healthbar)
+                nameplate.name:ClearAllPoints()
+                nameplate.name:SetPoint("BOTTOM", nameplate.health, "TOP", 0, 14)
+            else
+                -- Debuffs above mana bar (or healthbar if no mana)
+                if nameplate.mana and nameplate.mana:IsShown() then
+                    debuff:SetPoint("BOTTOM", nameplate.mana, "TOP", x, 1)
+                else
+                    debuff:SetPoint("BOTTOM", nameplate.health, "TOP", x, 1)
+                end
+
+                -- Adjust name
+                nameplate.name:ClearAllPoints()
+                nameplate.name:SetPoint("TOP", nameplate.health, "BOTTOM", 0, -6)
+            end
+        end
+    else
     -- Reset positions if no debuffs
         UpdateNamePlateDimensions(frame)
     end
