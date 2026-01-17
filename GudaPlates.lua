@@ -1304,8 +1304,6 @@ if unitstr and TWThreat_TankModeData and isHostile then
     end
 end
 
-    -- Determine color based on role and threat
--- Determine color based on role and threat
 -- Determine color based on role and threat
 if isFriendly then
     nameplate.health:SetStatusBarColor(0.27, 0.63, 0.27, 1)
